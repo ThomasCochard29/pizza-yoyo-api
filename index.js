@@ -7,6 +7,7 @@ import cookieParser from "cookie-parser";
 //! Import Routes
 import authRoutes from "./routes/auth.js"
 import userRoutes from "./routes/users.js"
+import categorieRoutes from "./routes/categories.js"
 
 const app = express();
 
@@ -26,6 +27,7 @@ app.use(express.urlencoded({ extended: false }));
 //! Routes
 app.use("/api/auth", authRoutes)
 app.use("/api/users", userRoutes)
+app.use("/api/categories", categorieRoutes)
 
 //! Message Start Server
 app.listen(8800, () => {
