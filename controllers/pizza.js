@@ -3,6 +3,7 @@ import path from "path";
 import util from "util";
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
+import { ChildProcess } from "child_process";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -17,10 +18,10 @@ export const getPizza = (req, res) => {
 };
 
 export const getIdPizza = (req, res) => {
-  const q = "SELECT * WHERE id = ?";
-  const id = req.params.id;
+  const q = "SELECT * FROM pizza WHERE id_pizza = ?";
+  const id_pizza = req.params.id;
 
-  db.query(q, [id], (err, data) => {
+  db.query(q, [id_pizza], (err, data) => {
     if (err) return res.status(500).json(err);
     return res.json(data);
   });
@@ -99,7 +100,8 @@ export const updatePizza = async (req, res) => {
 
     await util.promisify(file.mv)(path.join(imagePath, md5 + extension));
 
-    const q = "UPDATE pizza SET nom = ?, description = ?, prix = ?, image = ?, image_descrip = ?, categorie_id = ? WHERE id = ?";
+    const q = "UPDATE pizza SET nom = ?, description = ?, prix = ?, image = ?, image_descrip = ?, categorie_id = ? WHERE id_pizza = ?";
+    const id_pizza = req.params.id
     const values = [
       req.body.nom,
       req.body.description,
@@ -107,10 +109,9 @@ export const updatePizza = async (req, res) => {
       URL,
       req.body.image_descrip,
       req.body.categorie_id,
-      req.body.id, // ID de la pizza à mettre à jour (à fournir dans la requête)
     ];
 
-    db.query(q, values, (err, data) => {
+    db.query(q, [...values, id_pizza], (err, data) => {
       if (err) {
         console.error('Erreur lors de la mise à jour de la pizza:', err);
         return res.status(500).json({ message: 'Erreur lors de la mise à jour de la pizza' });
@@ -125,3 +126,13 @@ export const updatePizza = async (req, res) => {
     });
   }
 };
+
+export const deletePizza = (req, res) => {
+  const sql = "DELETE FROM pizza WHERE id_pizza = ?";
+  const id_pizza = req.params.id_pizza;
+
+  db.query(sql, [id_pizza], (err, data) => {
+      if(err) return res.json(err);
+      return res.json("deleted");
+  })
+}
